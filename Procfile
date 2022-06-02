@@ -1,1 +1,1 @@
-web: gunicorn postgresTest.wsgi
+web: gunicorn --bind 0.0.0.0:$PORT postgresTest.wsgi
