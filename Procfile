@@ -1,1 +1,1 @@
-web: gunicorn --bind 0.0.0.0:$PORT postgresTest.wsgi
+web: gunicorn postgresTest.wsgi:application --log-file - --log-level debug
