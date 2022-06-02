@@ -1,1 +1,1 @@
-web: gunicorn main:app
+web: gunicorn postgresTest.wsgi:app --log-file - --log-level debug
