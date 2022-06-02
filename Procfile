@@ -1,1 +1,1 @@
-web: gunicorn postgresTest.wsgi --log-file -
+web: gunicorn postgresTest.wsgi
