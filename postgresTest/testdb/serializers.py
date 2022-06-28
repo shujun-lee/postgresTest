@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import CustomUser
+from .models import CustomUser, Workout
 
 class CustomUserSerializer(serializers.ModelSerializer):
     """
@@ -23,3 +23,8 @@ class CustomUserSerializer(serializers.ModelSerializer):
             instance.set_password(password)
         instance.save()
         return instance
+
+class WorkoutSerializers(serializers.ModelSerializer):
+    class Meta:
+        model = Workout
+        fields = ( "id", "start", "end", "weights_lifted" , "duration", "user")

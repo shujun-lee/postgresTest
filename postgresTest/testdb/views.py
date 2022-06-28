@@ -1,8 +1,11 @@
 from rest_framework import status, permissions
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.generics import ListAPIView
+from rest_framework.viewsets import ModelViewSet
 
-from .serializers import CustomUserSerializer
+from .models import CustomUser, Workout
+from .serializers import CustomUserSerializer, WorkoutSerializers
 
 
 class CustomUserCreate(APIView):
@@ -22,3 +25,16 @@ class HelloWorldView(APIView):
 
     def get(self, request):
         return Response(data={"hello":"world"}, status=status.HTTP_200_OK)
+
+#list user route
+class UserListAPIView(ListAPIView):
+
+    permission_classes = (permissions.AllowAny,)
+
+    queryset = CustomUser.objects.all()
+    serializer_class = CustomUserSerializer
+
+#insert workout details
+class WorkoutModelViewSet(ModelViewSet):
+    queryset = Workout.objects.all()
+    serializer_class = WorkoutSerializers
