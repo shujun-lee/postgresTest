@@ -4,8 +4,8 @@ from rest_framework.views import APIView
 from rest_framework.generics import ListAPIView
 from rest_framework.viewsets import ModelViewSet
 
-from .models import CustomUser, Workout
-from .serializers import CustomUserSerializer, WorkoutSerializers
+from .models import CustomUser, Workout, WorkExercise, WorkExerciseDetails
+from .serializers import CustomUserSerializer, WorkoutSerializers, WorkExerciseSerializers, WorkExerciseDetailsSerializers
 
 
 class CustomUserCreate(APIView):
@@ -34,7 +34,23 @@ class UserListAPIView(ListAPIView):
     queryset = CustomUser.objects.all()
     serializer_class = CustomUserSerializer
 
-#insert workout details
-class WorkoutModelViewSet(ModelViewSet):
+#Workout model
+class WorkoutViewSet(ModelViewSet):
+
+    permission_classes = (permissions.AllowAny,)
+
     queryset = Workout.objects.all()
+
+    #possible to use different Serializer for Read and Write
     serializer_class = WorkoutSerializers
+
+#Workout Exercise model
+class WorkExerciseViewSet(ModelViewSet):
+    permission_classes = (permissions.AllowAny,)
+    queryset = WorkExercise.objects.all()
+    serializer_class = WorkExerciseSerializers
+
+class WorkExerciseDetailsViewSet(ModelViewSet):
+    permission_classes = (permissions.AllowAny,)
+    queryset = WorkExerciseDetails.objects.all()
+    serializer_class = WorkExerciseDetailsSerializers

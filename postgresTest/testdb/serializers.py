@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import CustomUser, Workout
+from .models import CustomUser, Workout, WorkExercise, WorkExerciseDetails
 
 class CustomUserSerializer(serializers.ModelSerializer):
     """
@@ -25,6 +25,22 @@ class CustomUserSerializer(serializers.ModelSerializer):
         return instance
 
 class WorkoutSerializers(serializers.ModelSerializer):
+    #have a standalone serializer for CRUD?
+
+    #accept username value in user field
+    user = serializers.SlugRelatedField(slug_field="username", queryset=CustomUser.objects.all())
     class Meta:
         model = Workout
         fields = ( "id", "start", "end", "weights_lifted" , "duration", "user")
+
+class WorkExerciseSerializers(serializers.ModelSerializer):
+    workout = WorkoutSerializers()
+    class Meta:
+        model = WorkExercise
+        fields = ("name", "workset_weight", "notes", "workout")
+
+class WorkExerciseDetailsSerializers(serializers.ModelSerializer):
+    w_exercise = WorkExerciseSerializers()
+    class Meta:
+        model = WorkExerciseDetails
+        fields = ("rep", "weight", "type", "w_exercise")
