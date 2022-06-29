@@ -24,6 +24,17 @@ class CustomUserSerializer(serializers.ModelSerializer):
         instance.save()
         return instance
 
+    def validate_username(self, value):
+        if User.objects.filter(username__iexact=value).exists():
+            raise serializers.ValidationError("A user with this username already exists.")
+        return value
+
+    def clean_email(self):
+        email = self.cleaned_data.get("email")
+        if User.objects.filter(email__iexact=email).exists():
+            self.add_error("email", _("A user with this email already exists."))
+        return email
+        
 class WorkoutSerializers(serializers.ModelSerializer):
     #have a standalone serializer for CRUD?
 

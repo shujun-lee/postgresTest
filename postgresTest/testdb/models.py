@@ -29,6 +29,9 @@ class Workout(models.Model):
     duration = models.IntegerField(blank=True, default='0')
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
 
+    #duration a calculated field base on end - start? Model Method?
+    #total weights_lifted
+
     def __str__(self) -> str:
         return f"{self.user} {self.start}"
 
@@ -38,6 +41,7 @@ class WorkExercise(models.Model):
     notes = models.TextField(blank=True, default='0')
     workout = models.ForeignKey(Workout, on_delete=models.CASCADE)
 
+    #https://simpleisbetterthancomplex.com/tips/2018/02/10/django-tip-22-designing-better-models.html#reverse-relationships
     def __str__(self) -> str:
         return f"{self.id} {self.name}"
 
