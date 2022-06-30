@@ -1,23 +1,19 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
-# Create your models here.
-
 #extend from standard Django User Model
-
 class CustomUser(AbstractUser):
     KILOGRAM = 'kg'
     POUND = 'lbs'
-    UNITS = [
+    UNIT_CHOICES = (
         (KILOGRAM, 'kg'),
         (POUND, 'lb')
-    ]
+    )
 
-    fav_color = models.CharField(blank=True, max_length=120)
     birth_year = models.IntegerField(blank=True, default='1970')
-    body_weight = models.DecimalField(blank=True, decimal_places=2, max_digits=4, default='0')
-    preferred_unit = models.CharField(max_length=3, choices=UNITS, default = KILOGRAM)
-    barbell_weight = models.DecimalField(blank=True, decimal_places=2, max_digits=4, default='0')
+    body_weight = models.DecimalField(blank=True, decimal_places=2, max_digits=5, default='0.00')
+    preferred_unit = models.CharField(max_length=3, choices=UNIT_CHOICES, default = KILOGRAM)
+    barbell_weight = models.DecimalField(blank=True, decimal_places=2, max_digits=5, default='0.00')
 
     def __str__(self) -> str:
         return self.username
@@ -25,9 +21,14 @@ class CustomUser(AbstractUser):
 class Workout(models.Model):
     start = models.DateTimeField(auto_now=False)
     end = models.DateTimeField(auto_now=False)
-    weights_lifted = models.IntegerField(blank=True, default='0')
+    weights_lift = models.DecimalField(blank=True, decimal_places=2, max_digits=7)
     duration = models.IntegerField(blank=True, default='0')
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    user = models.ForeignKey(
+        CustomUser,
+        on_delete=models.CASCADE,
+        related_name='workouts',
+        related_query_name='weights_lift'
+    )
 
     #duration a calculated field base on end - start? Model Method?
     #total weights_lifted
@@ -36,26 +37,53 @@ class Workout(models.Model):
         return f"{self.user} {self.start}"
 
 class WorkExercise(models.Model):
-    name = models.CharField(blank=True, max_length=256)
-    workset_weight = models.IntegerField(blank=True, default='0')
+    #include list of exercise here?
+    BENCH_PRESS = 'BP'
+    SQUAT = 'S'
+    DEADLIFT = 'DL'
+    BENCH_ROW = 'BR'
+    EXERCISE_CHOICES = (
+        (BENCH_PRESS, 'Bench Press'),
+        (SQUAT, 'Squat'),
+        (DEADLIFT, 'Deadlift'),
+        (BENCH_ROW, 'Bench Row')
+    )
+
+    exercise_name = models.CharField('name', choices=EXERCISE_CHOICES, max_length=2, default='BP')
+    workset_weight = models.DecimalField(blank=True, decimal_places=2, max_digits=7)
     notes = models.TextField(blank=True, default='0')
-    workout = models.ForeignKey(Workout, on_delete=models.CASCADE)
+    workout = models.ForeignKey(
+        Workout,
+        on_delete=models.CASCADE,
+        related_name='workout_exercises',
+        related_query_name='exercise_name'
+    )
 
     #https://simpleisbetterthancomplex.com/tips/2018/02/10/django-tip-22-designing-better-models.html#reverse-relationships
     def __str__(self) -> str:
         return f"{self.id} {self.name}"
 
+class WorkExerciseImage(models.Model):
+    image = models.ImageField(upload_to='workout_exercise')
+    workout_exercise = models.ForeignKey(
+        WorkExercise,
+        on_delete=models.CASCADE,
+        related_name='workout_exercise_images'
+    )
+
+#Model name should be singular
 class WorkExerciseDetails(models.Model):
     WORKSET = 'work_set'
     WARMUPSET = 'warmup_set'
-    TYPE = [
-        (WORKSET, 'work_set'),
-        (WARMUPSET, 'warmup_set')
-    ]
-    rep = models.IntegerField(blank=True, default='0')
-    weight = models.IntegerField(blank=True, default='0')
-    type = models.CharField(max_length=11, choices=TYPE, default = None)
-    w_exercise = models.ForeignKey(WorkExercise, on_delete=models.CASCADE)
+    TYPE_CHOICES = (
+        (WORKSET, 'work set'),
+        (WARMUPSET, 'warmup set')
+    )
+
+    rep_complete = models.IntegerField('rep', blank=True, default='0')
+    weight = models.DecimalField(blank=True, decimal_places=2, max_digits=5)
+    set_type = models.CharField('type', max_length=11, choices=TYPE_CHOICES, default = None)
+    workout_exercise = models.ForeignKey(WorkExercise, on_delete=models.CASCADE, related_name='workout_exercise_details', default='1')
 
     def __str__(self) -> str:
         return self.id
