@@ -1,13 +1,20 @@
+from email import message_from_string
 from rest_framework import serializers
 from .models import CustomUser, Workout, WorkExercise, WorkExerciseDetails
 from datetime import date
+from rest_framework.validators import UniqueValidator
 
+#do i need to store gender?
 class CustomUserSerializer(serializers.ModelSerializer):
     """
     Currently unused in preference of the below.
     """
     email = serializers.EmailField(
-        required=True
+        required=True,
+        validators=[
+            UniqueValidator(queryset=CustomUser.objects.all(), message='A user with that email address already exists.')
+            ],
+
     )
     username = serializers.CharField()
     password = serializers.CharField(min_length=8, write_only=True)
@@ -28,18 +35,12 @@ class CustomUserSerializer(serializers.ModelSerializer):
         return instance
 
     def validate_username(self, value):
-        if User.objects.filter(username__iexact=value).exists():
+        if CustomUser.objects.filter(username__iexact=value).exists():
             raise serializers.ValidationError("A user with this username already exists.")
         return value
 
-    def clean_email(self):
-        email = self.cleaned_data.get("email")
-        if User.objects.filter(email__iexact=email).exists():
-            self.add_error("email", _("A user with this email already exists."))
-        return email
-
     def get_age(self, obj):
-        delta = year.today() - obj.birth_year
+        delta = int(date.today().year) - obj.birth_year
         return int(delta)
 
 class WorkoutSerializers(serializers.ModelSerializer):
