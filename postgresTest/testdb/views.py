@@ -1,13 +1,16 @@
 from rest_framework import status, permissions
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.generics import ListAPIView
-from rest_framework.viewsets import ModelViewSet
+from rest_framework.generics import ListAPIView, RetrieveUpdateDestroyAPIView
+from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 
 from .models import CustomUser, Workout, WorkExercise, WorkExerciseDetails
-from .serializers import CustomUserSerializer, WorkoutSerializers, WorkExerciseSerializers, WorkExerciseDetailsSerializers
+from .serializers import CustomUserSerializer, UserBioSerializer, GetUserWorkoutSerializer, WorkoutSerializers, WorkExerciseSerializers, WorkExerciseDetailsSerializers
 
-
+# Viewset vs
+# Generic Views (ListCreateAPIView, RetrieveUpdateDestroyAPIView) model related vs
+# APIView - similar to regular View
+# x Function based views.x
 class CustomUserCreate(APIView):
     permission_classes = (permissions.AllowAny,)
 
@@ -30,9 +33,14 @@ class HelloWorldView(APIView):
 class UserListAPIView(ListAPIView):
 
     permission_classes = (permissions.AllowAny,)
-
     queryset = CustomUser.objects.all()
     serializer_class = CustomUserSerializer
+
+class UserProfileUpdateAPIView(RetrieveUpdateDestroyAPIView):
+
+    permission_classes = (permissions.AllowAny,)
+    queryset = CustomUser.objects.all()
+    serializer_class = UserBioSerializer
 
 #Workout model
 class WorkoutViewSet(ModelViewSet):

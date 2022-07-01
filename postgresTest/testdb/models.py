@@ -83,8 +83,8 @@ class WorkExerciseDetails(models.Model):
     weight = models.DecimalField(blank=True, decimal_places=2, max_digits=5)
     set_type = models.CharField('type', max_length=11, choices=TYPE_CHOICES, default = 'warmup_set')
     workout_exercise = models.ForeignKey(
-        WorkExercise, 
-        on_delete=models.CASCADE, 
+        WorkExercise,
+        on_delete=models.CASCADE,
         related_name='workout_exercise_details')
 
     def __str__(self) -> str:
