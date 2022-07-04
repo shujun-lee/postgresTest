@@ -15,7 +15,11 @@ class CustomUserSerializer(serializers.ModelSerializer):
             UniqueValidator(queryset=CustomUser.objects.all(), message='A user with that email address already exists.')
             ],
     )
-    username = serializers.CharField()
+    username = serializers.CharField(
+         validators=[
+            UniqueValidator(queryset=CustomUser.objects.all(), message='A user with this username already exists.')
+            ],
+    )
     password = serializers.CharField(min_length=8, write_only=True)
     age = serializers.SerializerMethodField()
 
@@ -32,58 +36,68 @@ class CustomUserSerializer(serializers.ModelSerializer):
         instance.save()
         return instance
 
-    def validate_username(self, value):
-        if CustomUser.objects.filter(username__iexact=value).exists():
-            raise serializers.ValidationError("A user with this username already exists.")
-        return value
-
     def get_age(self, obj):
         delta = int(date.today().year) - obj.birth_year
         return int(delta)
 
-#create need password, update no need password [different fields same methods]
-class UserBioSerializer(serializers.ModelSerializer):
-    age = serializers.SerializerMethodField()
-    username = serializers.CharField(required=False)
 
-    class Meta:
-        model = CustomUser
-        fields = ('email', 'username', 'birth_year', 'body_weight', 'preferred_unit', 'barbell_weight', 'age')
-
-    def validate_username(self, value):
-        if CustomUser.objects.filter(username__iexact=value).exists():
-            raise serializers.ValidationError("A user with this username already exists.")
-        return value
-
-    def get_age(self, obj):
-        delta = int(date.today().year) - obj.birth_year
-        return int(delta)
-
-class GetUserWorkoutSerializer(serializers.ModelSerializer):
-    workouts = serializers.PrimaryKeyRelatedField(many=True, queryset=Workout.objects.all())
-    class Meta:
-        model = CustomUser
-        fields = ('username', 'workouts')
 class WorkExerciseDetailsSerializers(serializers.ModelSerializer):
     class Meta:
         model = WorkExerciseDetails
-        fields = ("rep_complete", "weight", "set_type", "workout_exercise")
+        fields = ("rep_complete", "weight", "set_type")
 
 class WorkExerciseSerializers(serializers.ModelSerializer):
+    workout_exercise_details = WorkExerciseDetailsSerializers(many=True, read_only=True)
+
     class Meta:
         model = WorkExercise
-        workout_exercise_details = WorkExerciseDetailsSerializers(many=True, read_only=True)
         fields = ("exercise_name", "workset_weight", "notes", "workout", "workout_exercise_details")
 
 class WorkoutSerializers(serializers.ModelSerializer):
     #have a standalone serializer for CRUD?
 
     #calculate workout duration
-    user = CustomUserSerializer()
+    # user = CustomUserSerializer()
+    duration = serializers.SerializerMethodField()
     #accept username value in user field
     user = serializers.SlugRelatedField(slug_field="username", queryset=CustomUser.objects.all())
+    workout_exercises = WorkExerciseSerializers(many=True, read_only=True)
+    workout_exercise_details = WorkExerciseDetailsSerializers(many=True, read_only=True)
+
     class Meta:
-        workout_exercises = WorkExerciseSerializers(many=True, read_only=True)
         model = Workout
-        fields = ( "id", "start", "end", "weights_lift" , "duration", "user", 'workout_exercises')
+        fields = ( "id", "start", "end", "weights_lift" , "duration", "user", 'workout_exercises', 'workout_exercise_details' )
         extra_kwargs = {'workout_exercises': {'read_only': True}}
+
+    def get_duration(self, obj):
+        print('obj printout from work seralizer' + str(self))
+        return None
+
+#create need password, update no need password [different fields same methods]
+class UserUpdateSerializer(serializers.ModelSerializer):
+    age = serializers.SerializerMethodField()
+    username = serializers.CharField(
+        required=False,
+        validators=[
+            UniqueValidator(queryset=CustomUser.objects.all(), message='A user with this username already exists.')
+            ],)
+    workouts = WorkoutSerializers(many=True, read_only=True)
+ 
+    class Meta:
+        model = CustomUser
+        fields = ('email', 'username', 'birth_year', 'body_weight', 'preferred_unit', 'barbell_weight', 'age', 'workouts')
+        extra_kwargs = {'workouts': {'read_only': True}}
+
+    def get_age(self, obj):
+        delta = int(date.today().year) - obj.birth_year
+        return int(delta)
+
+class WriteWorkoutSerializer(serializers.ModelSerializer):
+    duration = serializers.SerializerMethodField()
+    class Meta:
+        model = Workout
+        fields = ( "id", "start", "end", "weights_lift" , "duration", "user", 'workout_exercises', 'workout_exercise_details' )
+        extra_kwargs = {'workout_exercises': {'read_only': True}}
+
+    def get_duration (self, obj):
+        print('obj printout ' + str(self.rep_complete))
