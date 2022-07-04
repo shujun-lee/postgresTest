@@ -5,7 +5,7 @@ from rest_framework.generics import ListAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 
 from .models import CustomUser, Workout, WorkExercise, WorkExerciseDetails
-from .serializers import CustomUserSerializer, UserUpdateSerializer, WorkoutSerializers, WorkExerciseSerializers, WorkExerciseDetailsSerializers, WriteWorkoutSerializer
+from .serializers import CustomUserSerializer, UserUpdateSerializer, ReadWorkoutSerializers, WorkExerciseSerializers, WorkExerciseDetailsSerializers, WriteWorkoutSerializer
 
 # Viewset vs
 # Generic Views (ListCreateAPIView, RetrieveUpdateDestroyAPIView) model related vs
@@ -57,7 +57,7 @@ class WorkoutViewSet(ModelViewSet):
 
     def get_serializer_class(self):
         if self.action in ("list", "retrieve"):
-            return WorkoutSerializers
+            return ReadWorkoutSerializers
         return WriteWorkoutSerializer
 
 

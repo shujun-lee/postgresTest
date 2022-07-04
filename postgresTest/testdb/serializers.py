@@ -1,4 +1,5 @@
 from email import message_from_string
+from wsgiref import validate
 from rest_framework import serializers
 from .models import CustomUser, Workout, WorkExercise, WorkExerciseDetails
 from datetime import date
@@ -40,17 +41,19 @@ class CustomUserSerializer(serializers.ModelSerializer):
         delta = int(date.today().year) - obj.birth_year
         return int(delta)
 
-
+#create no need to reference to workout exercise, but edit need - workout_exercise?
 class WorkExerciseDetailsSerializers(serializers.ModelSerializer):
     total_rep_weight = serializers.SerializerMethodField()
 
     class Meta:
         model = WorkExerciseDetails
-        fields = ("rep_complete", "weight", "set_type", "workout_exercise","id", "total_rep_weight")
+        fields = ("rep_complete", "weight", "set_type", "id", "total_rep_weight")
 
     def get_total_rep_weight(self, obj):
         total = obj.rep_complete * obj.weight
         return total
+
+#create no need to reference to workout, but edit need - workout?
 
 class WorkExerciseSerializers(serializers.ModelSerializer):
     workout_exercise_details = WorkExerciseDetailsSerializers(many=True, required=False)
@@ -60,7 +63,7 @@ class WorkExerciseSerializers(serializers.ModelSerializer):
 
     class Meta:
         model = WorkExercise
-        fields = ("exercise_name", "total_exercise_weight", "workset_weight", "notes", "workout", "workout_exercise_details")
+        fields = ("exercise_name", "total_exercise_weight", "workset_weight", "notes", "workout_exercise_details")
 
     #create workout exercise first and its details if any
     def create (self, validated_data):
@@ -90,14 +93,7 @@ class WorkExerciseSerializers(serializers.ModelSerializer):
         instance.notes = validated_data.get('notes', instance.notes)
         instance.save()
 
-        #multiple details, which one to update?
-        # if details:
-        #     workout_e_details.rep_complete = details.get('rep_complete', workout_e_details.rep_complete)
-        #     workout_e_details.weight = details.get('weight', workout_e_details.weight)
-        #     workout_e_details.set_type = details.get('set_type', workout_e_details.set_type)
-        #
-        # workout_e_details.save()
-
+ 
         return instance
 
     def get_total_exercise_weight (self, obj):
@@ -112,13 +108,12 @@ class WorkExerciseSerializers(serializers.ModelSerializer):
             total_exercise += total
         return total_exercise
 
-class WorkoutSerializers(serializers.ModelSerializer):
+class ReadWorkoutSerializers(serializers.ModelSerializer):
     duration = serializers.SerializerMethodField()
     #accept username value in user field
     user = serializers.SlugRelatedField(slug_field="username", queryset=CustomUser.objects.all())
     workout_exercises = WorkExerciseSerializers(many=True, read_only=True)
     workout_exercise_details = WorkExerciseDetailsSerializers(many=True, read_only=True)
-    weights_lift = serializers.SerializerMethodField()
 
     class Meta:
         model = Workout
@@ -131,19 +126,8 @@ class WorkoutSerializers(serializers.ModelSerializer):
         divmod(difference.days * seconds_in_day + difference.seconds, 60)
         return difference
 
-    def get_weights_lift(self, obj):
-        #get all workout exercise and exercise details under this workout pk
-        # workout_id = obj.id
-        # workout_exercises = WorkExercise.objects.filter(workout=workout_id)
-        print(self.data)
-        print(obj)
-        # workout_exerises_serialize = WorkExerciseSerializers(workout_exercises)
-        # print(workout_exerises_serialize.data)
-        #sum total exercise weight
-        # for exercise in workout_exerises_serialize:
-        #     print(exercise.total_exercise_weight)
-        pass
-#create need password, update no need password [different fields same methods]
+#create need password compulsory , update no need password [different fields same methods]
+#need ReadWorkoutSerializers during update?
 class UserUpdateSerializer(serializers.ModelSerializer):
     age = serializers.SerializerMethodField()
     username = serializers.CharField(
@@ -151,7 +135,7 @@ class UserUpdateSerializer(serializers.ModelSerializer):
         validators=[
             UniqueValidator(queryset=CustomUser.objects.all(), message='A user with this username already exists.')
             ],)
-    workouts = WorkoutSerializers(many=True, read_only=True)
+    workouts = ReadWorkoutSerializers(many=True, read_only=True)
 
     class Meta:
         model = CustomUser
@@ -162,36 +146,20 @@ class UserUpdateSerializer(serializers.ModelSerializer):
         delta = int(date.today().year) - obj.birth_year
         return int(delta)
 
+#workout is created without exercise and exercise details
 class WriteWorkoutSerializer(serializers.ModelSerializer):
     duration = serializers.SerializerMethodField()
-    workout_exercises = WorkExerciseSerializers(many=True, read_only=True)
-    workout_exercise_details = WorkExerciseDetailsSerializers(many=True, read_only=True)
     user = serializers.SlugRelatedField(slug_field="username", queryset=CustomUser.objects.all())
 
     class Meta:
         model = Workout
-        fields = ( "id", "start", "end", "weights_lift" , "duration", "user", 'workout_exercises', 'workout_exercise_details' )
-
-    #custom method required to writed nested fields
-    # def create(self, validated_data):
-    #     pass
-    def update(self, instance, validated_data):
-        #retreive workout instance
-        instance.id = validated_data.get('id', instance.id)
-        workout_exercises = validated_data.get('workout_exercises')
-        if workout_exercises:
-            pass
-        print(instance)
-        instance.save()
-        return instance
-        # instance.name = validated_data.get('name', instance.name)
-        # workout = Workout.objects.get(pk=validated_data.pop('id'))
+        fields = ( "id", "start", "end", "weights_lift" , "duration", "user")
 
     def validate(self, data):
         """
-        Check that start is before finish.
+        Check that start is before end.
         """
-        if data['start'] > data['finish']:
+        if data['start'] > data['end']:
             raise serializers.ValidationError("End must occur after start")
         return data
 
