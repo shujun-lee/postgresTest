@@ -21,3 +21,18 @@ serializer3 = CustomUserSerializer(instance=user3)
 #return what is being serialize.
 serializer.data
 serializer3.data
+
+details = WorkExerciseDetails.objects.filter(workout_exercise='2')
+
+total_exercise = []
+for d in WorkExerciseDetails.objects.filter(workout_exercise='2'):
+    total = d.rep_complete * d.weight
+    total_exercise.append(int(total))
+    print(total_exercise)
+
+def sum_list(l):
+    sum = 0
+    for x in l:
+        sum += x
+    return sum
+sum(total_exercise)

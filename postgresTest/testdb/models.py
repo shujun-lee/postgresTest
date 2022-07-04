@@ -2,6 +2,7 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 
 #extend from standard Django User Model
+
 class CustomUser(AbstractUser):
     KILOGRAM = 'kg'
     POUND = 'lbs'
@@ -10,8 +11,18 @@ class CustomUser(AbstractUser):
         (POUND, 'lb')
     )
 
+    MALE = 'M'
+    FEMALE = 'F'
+    NON_BINARY = 'NB'
+    GENDER_CHOICES = (
+        (MALE, 'Male'),
+        (FEMALE, 'Female'),
+        (NON_BINARY, 'Non Binary')
+    )
+
     birth_year = models.IntegerField(blank=True, default=1970)
     body_weight = models.DecimalField(blank=True, decimal_places=2, max_digits=5, default='45.00')
+    gender = models.CharField(max_length=2, choices=GENDER_CHOICES, default = MALE, blank=True)
     preferred_unit = models.CharField(max_length=3, choices=UNIT_CHOICES, default = KILOGRAM)
     barbell_weight = models.DecimalField(blank=True, decimal_places=2, max_digits=5, default='20.00')
 
@@ -32,9 +43,6 @@ class Workout(models.Model):
 
     #duration a calculated field base on end - start? Model Method?
     #total weights_lifted
-
-    def __str__(self) -> str:
-        return f"{self.user} {self.start}"
 
 class WorkExercise(models.Model):
     #include list of exercise here?
@@ -59,8 +67,6 @@ class WorkExercise(models.Model):
         related_query_name='exercise_name'
     )
 
-    def __str__(self) -> str:
-        return f"{self.id} {self.name}"
 
 class WorkExerciseImage(models.Model):
     image = models.ImageField(upload_to='workout_exercise')
@@ -86,6 +92,3 @@ class WorkExerciseDetails(models.Model):
         WorkExercise,
         on_delete=models.CASCADE,
         related_name='workout_exercise_details')
-
-    def __str__(self) -> str:
-        return self.id
