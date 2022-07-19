@@ -63,7 +63,7 @@ class WorkExerciseSerializers(serializers.ModelSerializer):
 
     class Meta:
         model = WorkExercise
-        fields = ("exercise_name", "total_exercise_weight", "workset_weight", "notes", "workout_exercise_details")
+        fields = ("id","workout", "exercise_name", "total_exercise_weight", "workset_weight", "notes", "workout_exercise_details")
 
     #create workout exercise first and its details if any
     def create (self, validated_data):
@@ -93,7 +93,7 @@ class WorkExerciseSerializers(serializers.ModelSerializer):
         instance.notes = validated_data.get('notes', instance.notes)
         instance.save()
 
- 
+
         return instance
 
     def get_total_exercise_weight (self, obj):
