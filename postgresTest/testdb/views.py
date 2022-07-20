@@ -42,6 +42,12 @@ class UserProfileUpdateAPIView(RetrieveUpdateDestroyAPIView):
     queryset = CustomUser.objects.all()
     serializer_class = UserUpdateSerializer
 
+# class WorkoutLatest(APIView):
+#     permission_classes = (permissions.AllowAny,)
+#
+#     def get(self, request):
+#
+
 #Workout model
 class WorkoutViewSet(ModelViewSet):
 
@@ -51,7 +57,7 @@ class WorkoutViewSet(ModelViewSet):
 
     #possible to use different Serializer for Read and Write
     # serializer_class = WorkoutSerializers
-    
+
     # def get_queryset(self):
     #  return Workout.objects.select_related("workout_exercises", "workout_exercise_details", "user").filter(user=1)
 

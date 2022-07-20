@@ -68,6 +68,7 @@ class WorkExerciseSerializers(serializers.ModelSerializer):
     #create workout exercise first and its details if any
     def create (self, validated_data):
         details = validated_data.pop('workout_exercise_details', [])
+        workout_id = Workout.objects.latest('id')
         workout_exercise = WorkExercise.objects.create(**validated_data)
         #if there is details, create the details as WorkExerciseDetailsSerializers
         if details:
@@ -78,6 +79,7 @@ class WorkExerciseSerializers(serializers.ModelSerializer):
                 ],
             )
         return workout_exercise
+
 
     #update only the specific model, not the nested data
     def update(self, instance, validated_data):
@@ -150,10 +152,15 @@ class UserUpdateSerializer(serializers.ModelSerializer):
 class WriteWorkoutSerializer(serializers.ModelSerializer):
     duration = serializers.SerializerMethodField()
     user = serializers.SlugRelatedField(slug_field="username", queryset=CustomUser.objects.all())
+    start = serializers.DateTimeField()
+    end = serializers.DateTimeField()
+
+    # workout_exercises = WorkExerciseSerializers(many=True, allow_null=True)
+    # workout_exercise_details = WorkExerciseDetailsSerializers(many=True, allow_null=True)
 
     class Meta:
         model = Workout
-        fields = ( "id", "start", "end", "weights_lift" , "duration", "user")
+        fields = ("start", "end", "weights_lift" , "duration", "user")
 
     def validate(self, data):
         """
@@ -162,6 +169,35 @@ class WriteWorkoutSerializer(serializers.ModelSerializer):
         if data['start'] > data['end']:
             raise serializers.ValidationError("End must occur after start")
         return data
+
+    def create(self, validated_data):
+        """ Update workout end time if existing record with start time exist"""
+        workout,created = Workout.objects.update_or_create(
+            start = validated_data.get('start', None),
+            user = validated_data['user'],
+            weights_lift = validated_data['weights_lift'],
+            defaults = {'end': validated_data.get('end', None)})
+        print(created)
+        return workout
+
+        # if workout_exercises:
+        #     workout_id = Workout.objects.latest('id')
+        #     WorkExercise.objects.bulk_create(
+        #         [
+        #             #map input to Object relational model
+        #             WorkoutExercise(workout=workout_id , **workout_exercise)
+        #             for workout_exercise in workout_exercises
+        #         ]
+        #     )
+
+        # #if there is details, create the details as WorkExerciseDetailsSerializers
+        # if details:
+        #     WorkExerciseDetails.objects.bulk_create(
+        #         [
+        #             WorkExerciseDetails(workout_exercise=workout_exercise, **workout_exercise_details)
+        #             for workout_exercise_details in details
+        #         ],
+        #     )
 
     def get_duration (self, validated_data):
         difference = validated_data.end - validated_data.start

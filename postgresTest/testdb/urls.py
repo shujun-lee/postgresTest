@@ -16,6 +16,7 @@ urlpatterns = [
     # path('user/exercise/', UserListAPIView.as_view(), name="user_exercise"),
     path('user/profile/', UserListAPIView.as_view(), name="user_profile"),
     path('user/profile/<int:pk>', UserProfileUpdateAPIView.as_view(), name="user_profile"),
+    # path('workout/user/latest', )
 
 
     # path('workout/', WorkoutModelViewSet.as_view(), name="workout"),
