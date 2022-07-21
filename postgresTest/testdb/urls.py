@@ -14,7 +14,7 @@ urlpatterns = [
     path('token/refresh/', jwt_views.TokenRefreshView.as_view(), name='token_refresh'),
     path('user/create/', CustomUserCreate.as_view(), name="create_user"),
     # path('user/exercise/', UserListAPIView.as_view(), name="user_exercise"),
-    path('user/profile/', UserListAPIView.as_view(), name="user_profile"),
+    path('user/profile/' , UserListAPIView.as_view(), name="users"),
     path('user/profile/<int:pk>', UserProfileUpdateAPIView.as_view(), name="user_profile"),
     # path('workout/user/latest', )
 

@@ -4,6 +4,7 @@ from rest_framework.test import APITestCase
 
 from .models import CustomUser, Workout, WorkExercise, WorkExerciseDetails
 import datetime
+
 class AccountTests(APITestCase):
     def test_create_account(self):
         """
@@ -58,6 +59,12 @@ class AccountTests(APITestCase):
             'weights_lift': 10.00,
             'user': 'user1',
         }
+
         response2 = self.client.post(url, data2, format='json')
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(Workout.objects.count(), 1)
+        workout = Workout.objects.all()
+        print(workout[1].start)
+        
+        self.assertEqual(response2.status_code, status.HTTP_201_CREATED)
+        # self.assertEqual(Workout.objects.count(), 1)
+        self.assertEqual(workout[1].start, workout[0].start)
+
