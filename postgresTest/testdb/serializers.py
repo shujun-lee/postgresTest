@@ -57,15 +57,15 @@ class WorkExerciseDetailsSerializers(serializers.ModelSerializer):
 
 class WorkExerciseSerializers(serializers.ModelSerializer):
     workout_exercise_details = WorkExerciseDetailsSerializers(many=True, required=False)
-    workset_weight = serializers.IntegerField(required=False)
-    # total_exercise_weight = serializers.SerializerMethodField()
+    workset_weight = serializers.IntegerField(required=True)
+    total_exercise_weight = serializers.SerializerMethodField()
     exercise_name = serializers.CharField(required=False)
     workout = serializers.PrimaryKeyRelatedField(read_only=True)
 
 
     class Meta:
         model = WorkExercise
-        fields = ("id","workout", "exercise_name", "workset_weight", "notes", "workout_exercise_details")
+        fields = ("id","workout", "exercise_name", "workset_weight","total_exercise_weight", "notes", "workout_exercise_details")
 
     #create workout exercise first and its details if any
     def create (self, validated_data):
@@ -80,6 +80,7 @@ class WorkExerciseSerializers(serializers.ModelSerializer):
                     for workout_exercise_details in details
                 ],
             )
+        
         return workout_exercise
 
 
@@ -100,17 +101,17 @@ class WorkExerciseSerializers(serializers.ModelSerializer):
 
         return instance
 
-    # def get_total_exercise_weight (self, obj):
-    #     #get all workout exercise details under this workout exercise details pk
-    #     workout_id = obj.id
-    #     details = WorkExerciseDetails.objects.filter(workout_exercise=workout_id)
-    #
-    #     #compute
-    #     total_exercise = 0
-    #     for d in details:
-    #         total = d.rep_complete * d.weight
-    #         total_exercise += total
-    #     return total_exercise
+    def get_total_exercise_weight (self, obj):
+        #get all workout exercise details under this workout exercise details pk
+        workout_id = obj.id
+        details = WorkExerciseDetails.objects.filter(workout_exercise=workout_id)
+    
+        #compute
+        total_exercise = 0
+        for d in details:
+            total = d.rep_complete * d.weight
+            total_exercise += total
+        return total_exercise
 
 class ReadWorkoutSerializers(serializers.ModelSerializer):
     duration = serializers.SerializerMethodField()
@@ -179,7 +180,7 @@ class WriteWorkoutSerializer(serializers.ModelSerializer):
             user = validated_data['user'],
             weights_lift = validated_data['weights_lift'],
             defaults = {'end': validated_data.get('end', None)})
-        print(created)
+        # print(created)
         return workout
 
         # if workout_exercises:
