@@ -66,6 +66,9 @@ class WorkoutViewSet(ModelViewSet):
             return ReadWorkoutSerializers
         return WriteWorkoutSerializer
 
+    # def perform_create(self, serializer):
+    #     return serializer.save(owner = self.request.user)
+
 
 #Workout Exercise model
 class WorkExerciseViewSet(ModelViewSet):
@@ -73,6 +76,9 @@ class WorkExerciseViewSet(ModelViewSet):
     queryset = WorkExercise.objects.all()
     serializer_class = WorkExerciseSerializers
 
+    def perform_create(self, serializer):
+        print('in perform_create')
+        serializer.save(workout=Workout.objects.latest('id'))
 
 class WorkExerciseDetailsViewSet(ModelViewSet):
     permission_classes = (permissions.AllowAny,)

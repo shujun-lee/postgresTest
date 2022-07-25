@@ -46,10 +46,10 @@ class Workout(models.Model):
 
 class WorkExercise(models.Model):
     #include list of exercise here?
-    BENCH_PRESS = 'BP'
-    SQUAT = 'S'
-    DEADLIFT = 'DL'
-    BENCH_ROW = 'BR'
+    BENCH_PRESS = 'Bench Press'
+    SQUAT = 'Squat'
+    DEADLIFT = 'Deadlift'
+    BENCH_ROW = 'Bench Row'
     EXERCISE_CHOICES = (
         (BENCH_PRESS, 'Bench Press'),
         (SQUAT, 'Squat'),
@@ -57,7 +57,7 @@ class WorkExercise(models.Model):
         (BENCH_ROW, 'Bench Row')
     )
 
-    exercise_name = models.CharField('name', choices=EXERCISE_CHOICES, max_length=2)
+    exercise_name = models.CharField('name', choices=EXERCISE_CHOICES, max_length=11)
     workset_weight = models.DecimalField(blank=True, decimal_places=2, max_digits=7)
     notes = models.TextField(blank=True)
     workout = models.ForeignKey(

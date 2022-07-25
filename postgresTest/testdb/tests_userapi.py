@@ -9,28 +9,28 @@ from .serializers import *
 import datetime
 # Create your tests here.
 
-class GetUserTestCase(APITestCase):
+class UserTestCase(APITestCase):
     def setUp(self):
-        
+
         self.admin = CustomUser.objects.create(email = "test@gmail.com", username = "admin", password = "12345678")
         self.user2 = CustomUser.objects.create(email = "test@gmail.com", username = "user2", password = "12345678", birth_year = 1988, body_weight = 10.01, preferred_unit = 'lbs', barbell_weight = 10.10)
         self.user3 = CustomUser.objects.create(email = "test@gmail.com", username = "user3", password = "12345678", birth_year = 1988, body_weight = 10.01, preferred_unit = 'lbs', barbell_weight = 10.10)
         self.user4 = CustomUser.objects.create(email = "test@gmail.com", username = "user4", password = "12345678", birth_year = 1988, body_weight = 10.01, preferred_unit = 'lbs', barbell_weight = 10.10)
 
         self.valid_user = {
-            'username': "admin1", 
+            'username': "admin1",
             'birth_year': 1988,
-            'email': "efg@gmail.com", 
-            'password': "1234567890", 
+            'email': "efg@gmail.com",
+            'password': "1234567890",
             'body_weight' : 10.01,
-            'preferred_unit' : 'lbs', 
+            'preferred_unit' : 'lbs',
             'barbell_weight': 10.10,
         }
         self.invalid_user = {
-            'username': "admin1", 
-            'password': "1234567890", 
+            'username': "admin1",
+            'password': "1234567890",
             'body_weight' : 10.01,
-            'preferred_unit' : 'lbs', 
+            'preferred_unit' : 'lbs',
             'barbell_weight': 10.10,
         }
     def test_get_all_user(self):
@@ -42,12 +42,12 @@ class GetUserTestCase(APITestCase):
         serializer = CustomUserSerializer(user_profile, many=True)
         self.assertEqual(response.data, serializer.data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-    
+
     def test_get_valid_single_user(self):
         #API Response
         id = {'pk':self.admin.pk}
         url = reverse('user_profile', kwargs=id)
-        
+
         response = self.client.get(url)
         #get data from db
         user = CustomUser.objects.get(pk=self.admin.pk)
@@ -56,14 +56,14 @@ class GetUserTestCase(APITestCase):
         print(serializer.data)
         self.assertEqual(response.data, serializer.data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-    
+
     def test_get_invalid_single_user(self):
         id = {'pk':30}
         url = reverse('user_profile', kwargs=id)
 
         response = self.client.get(url)
         self.assertNotEqual(response.status_code, status.HTTP_200_OK)
-    
+
     def test_post_valid_user(self):
         url = reverse('create_user')
 
@@ -71,7 +71,7 @@ class GetUserTestCase(APITestCase):
         response = self.client.post(url, self.valid_user, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(CustomUser.objects.count(), 5)
-    
+
     def test_post_invalid_user(self):
         url = reverse('create_user')
 
@@ -82,7 +82,7 @@ class GetUserTestCase(APITestCase):
         #API Response
         id = {'pk':self.admin.pk}
         url = reverse('user_profile', kwargs=id)
-        
+
         self.update_data = {
             'username': 'admin100'
         }
