@@ -32,15 +32,19 @@ class HelloWorldView(APIView):
 #list user route
 class UserListAPIView(ListAPIView):
 
-    permission_classes = (permissions.AllowAny,)
+    # permission_classes = (permissions.AllowAny,)
     queryset = CustomUser.objects.all()
     serializer_class = CustomUserSerializer
+
+    # def get_queryset(self):
+    #     return CustomUser.objects.filter(user=self.request.user)
 
 class UserProfileUpdateAPIView(RetrieveUpdateDestroyAPIView):
 
     permission_classes = (permissions.AllowAny,)
     queryset = CustomUser.objects.all()
     serializer_class = UserUpdateSerializer
+    slug_field = 'username'
 
 # class WorkoutLatest(APIView):
 #     permission_classes = (permissions.AllowAny,)
@@ -51,7 +55,7 @@ class UserProfileUpdateAPIView(RetrieveUpdateDestroyAPIView):
 #Workout model
 class WorkoutViewSet(ModelViewSet):
 
-    permission_classes = (permissions.AllowAny,)
+    # permission_classes = (permissions.AllowAny,)
 
     queryset = Workout.objects.all()
 
@@ -66,13 +70,15 @@ class WorkoutViewSet(ModelViewSet):
             return ReadWorkoutSerializers
         return WriteWorkoutSerializer
 
+    def get_queryset(self):
+        return Workout.objects.filter(user=self.request.user)
     # def perform_create(self, serializer):
     #     return serializer.save(owner = self.request.user)
 
 
 #Workout Exercise model
 class WorkExerciseViewSet(ModelViewSet):
-    permission_classes = (permissions.AllowAny,)
+    # permission_classes = (permissions.AllowAny,)
     queryset = WorkExercise.objects.all()
     serializer_class = WorkExerciseSerializers
 
@@ -81,6 +87,6 @@ class WorkExerciseViewSet(ModelViewSet):
         serializer.save(workout=Workout.objects.latest('id'))
 
 class WorkExerciseDetailsViewSet(ModelViewSet):
-    permission_classes = (permissions.AllowAny,)
+    # permission_classes = (permissions.AllowAny,)
     queryset = WorkExerciseDetails.objects.all()
     serializer_class = WorkExerciseDetailsSerializers
