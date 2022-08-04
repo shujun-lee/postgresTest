@@ -84,7 +84,9 @@ class WorkExerciseViewSet(ModelViewSet):
 
     def perform_create(self, serializer):
         print('in perform_create')
+        print(serializer.errors)
         serializer.save(workout=Workout.objects.latest('id'))
+
 
 class WorkExerciseDetailsViewSet(ModelViewSet):
     # permission_classes = (permissions.AllowAny,)
