@@ -5,6 +5,19 @@ from .models import CustomUser, Workout, WorkExercise, WorkExerciseDetails
 from datetime import date
 from rest_framework.validators import UniqueValidator
 
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+
+#extend the original TokenObtainPair to get user ID
+class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
+    def validate(self, attrs):
+        # The default result (access/refresh tokens)
+        data = super(CustomTokenObtainPairSerializer, self).validate(attrs)
+        # Custom data you want to include
+        data.update({'user': self.user.username})
+        data.update({'id': self.user.id})
+        # and everything else you want to send in the response
+        return data
+
 #do i need to store gender?
 class CustomUserSerializer(serializers.ModelSerializer):
     """
@@ -80,7 +93,7 @@ class WorkExerciseSerializers(serializers.ModelSerializer):
                     for workout_exercise_details in details
                 ],
             )
-        
+
         return workout_exercise
 
 
@@ -105,7 +118,7 @@ class WorkExerciseSerializers(serializers.ModelSerializer):
         #get all workout exercise details under this workout exercise details pk
         workout_id = obj.id
         details = WorkExerciseDetails.objects.filter(workout_exercise=workout_id)
-    
+
         #compute
         total_exercise = 0
         for d in details:

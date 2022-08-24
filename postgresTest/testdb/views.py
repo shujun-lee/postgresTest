@@ -4,13 +4,20 @@ from rest_framework.views import APIView
 from rest_framework.generics import ListAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 
+from rest_framework_simplejwt.views import TokenObtainPairView
+
 from .models import CustomUser, Workout, WorkExercise, WorkExerciseDetails
-from .serializers import CustomUserSerializer, UserUpdateSerializer, ReadWorkoutSerializers, WorkExerciseSerializers, WorkExerciseDetailsSerializers, WriteWorkoutSerializer
+from .serializers import CustomUserSerializer, UserUpdateSerializer, ReadWorkoutSerializers, WorkExerciseSerializers, WorkExerciseDetailsSerializers, WriteWorkoutSerializer, CustomTokenObtainPairSerializer
 
 # Viewset vs
 # Generic Views (ListCreateAPIView, RetrieveUpdateDestroyAPIView) model related vs
 # APIView - similar to regular View
 # x Function based views.x
+
+class CustomTokenObtainPairView(TokenObtainPairView):
+    # Replace the serializer with your custom
+    serializer_class = CustomTokenObtainPairSerializer
+
 class CustomUserCreate(APIView):
     permission_classes = (permissions.AllowAny,)
 
