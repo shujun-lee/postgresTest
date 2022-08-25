@@ -1,1 +1,1 @@
-web: gunicorn --pythonpath postgresTest.wsgi
+web: gunicorn postgresTest.wsgi:app
