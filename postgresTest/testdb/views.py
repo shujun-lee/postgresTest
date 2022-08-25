@@ -4,13 +4,20 @@ from rest_framework.views import APIView
 from rest_framework.generics import ListAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 
+from rest_framework_simplejwt.views import TokenObtainPairView
+
 from .models import CustomUser, Workout, WorkExercise, WorkExerciseDetails
-from .serializers import CustomUserSerializer, UserUpdateSerializer, ReadWorkoutSerializers, WorkExerciseSerializers, WorkExerciseDetailsSerializers, WriteWorkoutSerializer
+from .serializers import CustomUserSerializer, UserUpdateSerializer, ReadWorkoutSerializers, WorkExerciseSerializers, WorkExerciseDetailsSerializers, WriteWorkoutSerializer, CustomTokenObtainPairSerializer
 
 # Viewset vs
 # Generic Views (ListCreateAPIView, RetrieveUpdateDestroyAPIView) model related vs
 # APIView - similar to regular View
 # x Function based views.x
+
+class CustomTokenObtainPairView(TokenObtainPairView):
+    # Replace the serializer with your custom
+    serializer_class = CustomTokenObtainPairSerializer
+
 class CustomUserCreate(APIView):
     permission_classes = (permissions.AllowAny,)
 
@@ -32,26 +39,36 @@ class HelloWorldView(APIView):
 #list user route
 class UserListAPIView(ListAPIView):
 
-    permission_classes = (permissions.AllowAny,)
+    # permission_classes = (permissions.AllowAny,)
     queryset = CustomUser.objects.all()
     serializer_class = CustomUserSerializer
+
+    # def get_queryset(self):
+    #     return CustomUser.objects.filter(user=self.request.user)
 
 class UserProfileUpdateAPIView(RetrieveUpdateDestroyAPIView):
 
     permission_classes = (permissions.AllowAny,)
     queryset = CustomUser.objects.all()
     serializer_class = UserUpdateSerializer
+    slug_field = 'username'
+
+# class WorkoutLatest(APIView):
+#     permission_classes = (permissions.AllowAny,)
+#
+#     def get(self, request):
+#
 
 #Workout model
 class WorkoutViewSet(ModelViewSet):
 
-    permission_classes = (permissions.AllowAny,)
+    # permission_classes = (permissions.AllowAny,)
 
     queryset = Workout.objects.all()
 
     #possible to use different Serializer for Read and Write
     # serializer_class = WorkoutSerializers
-    
+
     # def get_queryset(self):
     #  return Workout.objects.select_related("workout_exercises", "workout_exercise_details", "user").filter(user=1)
 
@@ -60,15 +77,25 @@ class WorkoutViewSet(ModelViewSet):
             return ReadWorkoutSerializers
         return WriteWorkoutSerializer
 
+    def get_queryset(self):
+        return Workout.objects.filter(user=self.request.user)
+    # def perform_create(self, serializer):
+    #     return serializer.save(owner = self.request.user)
+
 
 #Workout Exercise model
 class WorkExerciseViewSet(ModelViewSet):
-    permission_classes = (permissions.AllowAny,)
+    # permission_classes = (permissions.AllowAny,)
     queryset = WorkExercise.objects.all()
     serializer_class = WorkExerciseSerializers
 
+    def perform_create(self, serializer):
+        print('in perform_create')
+        print(serializer.errors)
+        serializer.save(workout=Workout.objects.latest('id'))
+
 
 class WorkExerciseDetailsViewSet(ModelViewSet):
-    permission_classes = (permissions.AllowAny,)
+    # permission_classes = (permissions.AllowAny,)
     queryset = WorkExerciseDetails.objects.all()
     serializer_class = WorkExerciseDetailsSerializers
