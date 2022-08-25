@@ -30,7 +30,7 @@ SECRET_KEY = 'django-insecure-j!e#w(1!2gkw9$h+i+=$y!2y850-=d)-1e57ro(n-p$ka*vc7j
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['0.0.0.0', 'localhost', '127.0.0.1', 'damp-ocean-54420.herokuapp.com', '192.168.0.108']
+ALLOWED_HOSTS = ['0.0.0.0', 'localhost', '127.0.0.1', 'damp-ocean-54420.herokuapp.com', '192.168.0.108', '192.168.1.142']
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_CREDENTIALS = True
 
@@ -85,30 +85,35 @@ WSGI_APPLICATION = 'postgresTest.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'da3bfe3tonbdqh',
-        'USER': 'ynkdeahjxzario',
-        'PASSWORD': '6db099e2901d771dc4381f11727569dfeb174572cdd07cd66212bfb91beb05f3',
-        'HOST': 'ec2-52-204-195-41.compute-1.amazonaws.com',
-        'PORT': '5432',
-    }
-}
-
-#local
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-#         'NAME': 'dbtest',
-#         'USER': 'postgres',
-#         'PASSWORD': 'leeshujun',
-#         'HOST': '127.0.0.1',
+#         'NAME': 'da3bfe3tonbdqh',
+#         'USER': 'ynkdeahjxzario',
+#         'PASSWORD': '6db099e2901d771dc4381f11727569dfeb174572cdd07cd66212bfb91beb05f3',
+#         'HOST': 'ec2-52-204-195-41.compute-1.amazonaws.com',
 #         'PORT': '5432',
+#         'TEST': {
+#             'NAME': '',
+#             'USER': 'ynkdeahjxzario',
+#             'PASSWORD': '6db099e2901d771dc4381f11727569dfeb174572cdd07cd66212bfb91beb05f3',
+#         }
 #     }
 # }
-db_from_env = dj_database_url.config(conn_max_age=600)
-DATABASES['default'].update(db_from_env)
+
+#local
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'dbtest',
+        'USER': 'postgres',
+        'PASSWORD': 'leeshujun',
+        'HOST': '127.0.0.1',
+        'PORT': '5432',
+    }
+}
+# db_from_env = dj_database_url.config(conn_max_age=600)
+# DATABASES['default'].update(db_from_env)
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
@@ -139,7 +144,7 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=90),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=14),
     'ROTATE_REFRESH_TOKENS': True,
     'BLACKLIST_AFTER_ROTATION': False,
