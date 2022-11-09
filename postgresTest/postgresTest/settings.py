@@ -30,7 +30,7 @@ SECRET_KEY = 'django-insecure-j!e#w(1!2gkw9$h+i+=$y!2y850-=d)-1e57ro(n-p$ka*vc7j
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['0.0.0.0', 'localhost:3000', '127.0.0.1', 'damp-ocean-54420.herokuapp.com', '192.168.0.108', '192.168.1.142']
+ALLOWED_HOSTS = ['0.0.0.0', 'localhost:3000', '127.0.0.1', 'damp-ocean-54420.herokuapp.com', '192.168.0.108:3000', '192.168.1.142']
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_CREDENTIALS = True
 
