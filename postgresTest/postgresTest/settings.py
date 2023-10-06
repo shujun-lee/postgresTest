@@ -30,15 +30,23 @@ SECRET_KEY = 'django-insecure-j!e#w(1!2gkw9$h+i+=$y!2y850-=d)-1e57ro(n-p$ka*vc7j
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['0.0.0.0', 'localhost:3000', '127.0.0.1', 'damp-ocean-54420.herokuapp.com', '192.168.0.108:3000', '192.168.1.142']
+ALLOWED_HOSTS = ['0.0.0.0', 'localhost:3000', '127.0.0.1', '192.168.0.108:3000', '192.168.1.67', 'test']
 CORS_ORIGIN_ALLOW_ALL = True
-CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_CREDENTIALS = False
+CORS_ORIGIN_WHITELIST = [
+    'http://localhost:3000',
+    'http://192.168.1.67:8081'
+]
+CORS_ALLOWED_ORIGINS = [
+    'http://192.168.1.67:8081',
+    'https://32e5-118-200-66-74.ngrok-free.app'
+]
 
 # Application definition
 
 INSTALLED_APPS = [
     'whitenoise.runserver_nostatic',
-    'rest_framework',
+    'rest_framework_simplejwt',
     'testdb',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -46,9 +54,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'corsheaders'
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -139,7 +149,7 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated',
     ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
-'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),  #
 }
 
